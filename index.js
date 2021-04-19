@@ -1,29 +1,37 @@
+const https = require("https");
 const fs = require("fs");
-const fetch = require("node-fetch");
-
 const url = "https://jsonplaceholder.typicode.com/posts";
 
-const loadPost = async (url) => {
-  const response = await fetch(url);
-  if (response.status === 200) {
-    const posts = await response.json();
+https.get(url, (res) => {
+  res.setEncoding("utf8");
+  let post = "";
+  res.on("data", (data) => {
+    post += data;
+  });
+  res.on("end", () => {
+    post = JSON.parse(post);
+    // console.log(post);
 
-    fs.mkdir("result", (err) => {
-      if (err) {
-          console.log(err)
-      };
-      if (!err) {
-        fs.writeFile(
-          "./result/posts.json",
-          JSON.stringify(posts, null, 2),
-          (err) => {
-            if (err) {
-              console.log(err);
-            }
+    savePosts(post);
+  });
+});
+
+//save post to posts.json
+const savePosts = (post) => {
+  fs.mkdir("result", (err) => {
+    if (err) {
+      console.log(err);
+    }
+    if (!err) {
+      fs.writeFile(
+        "./result/posts.json",
+        JSON.stringify(post, null, 2),
+        (err) => {
+          if (err) {
+            console.log(err);
           }
-        );
-      }
-    });
-  }
+        }
+      );
+    }
+  });
 };
-loadPost(url);
