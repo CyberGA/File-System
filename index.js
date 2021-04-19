@@ -9,7 +9,9 @@ const loadPost = async (url) => {
     const posts = await response.json();
 
     fs.mkdir("result", (err) => {
-      if (err) throw err;
+      if (err) {
+          console.log(err)
+      };
       if (!err) {
         fs.writeFile(
           "./result/posts.json",
